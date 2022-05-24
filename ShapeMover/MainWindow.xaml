@@ -1,0 +1,77 @@
+﻿<Window x:Class="ShapeMover.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ShapeMover"
+        xmlns:utilities="clr-namespace:ShapeMover.Utilities"
+        mc:Ignorable="d"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        Title="Shape Mover" Height="484.667" Width="423.8" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Button Content="Add new shape" HorizontalAlignment="Left" Margin="10,15,0,0" VerticalAlignment="Top" Width="123" Command="{Binding Path=AddShapeCommand}"/>
+        <Button Content="Undo" HorizontalAlignment="Left" Margin="168,15,0,0" VerticalAlignment="Top" Width="75" Command="{Binding Path=UndoCommand}" />
+        <Button Content="Redo" HorizontalAlignment="Left" Margin="248,15,0,0" VerticalAlignment="Top" Width="75" Command="{Binding Path=RedoCommand}" />
+        <Border
+            BorderThickness="2"
+            BorderBrush="Black"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Width="400"
+            Height="402" Margin="5,39,5,5">
+            <ItemsControl ItemsSource="{Binding Circles}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas Height="400">
+                            <i:Interaction.Behaviors>
+                                <utilities:MouseBehaviour 
+                            MouseX="{Binding Path=PanelX, Mode=OneWayToSource}"
+                            MouseY="{Binding Path=PanelY, Mode=OneWayToSource}"
+                            />
+                            </i:Interaction.Behaviors>
+                        </Canvas>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemContainerStyle>
+                    <Style TargetType="ContentPresenter">
+                        <Setter Property="Canvas.Left" Value="{Binding Position.X, Mode=TwoWay}"/>
+                        <Setter Property="Canvas.Top" Value="{Binding Position.Y, Mode=TwoWay}"/>
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Ellipse Fill="{Binding Color}" Width="40" Height="40" IsHitTestVisible="True">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                    <i:InvokeCommandAction 
+                                    Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}},
+						            Path=DataContext.MouseLeftButtonDownCommand}" 
+                                    CommandParameter="{Binding}">
+                                    </i:InvokeCommandAction>
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="PreviewMouseUp" >
+                                    <i:InvokeCommandAction 
+                                    Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}},
+                                    Path=DataContext.MouseUpCommand}"
+                                    CommandParameter="{Binding}" />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseLeave" >
+                                    <i:InvokeCommandAction 
+                                    Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}},
+                                    Path=DataContext.MouseUpCommand}"
+                                    CommandParameter="{Binding}" />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="PreviewMouseMove" >
+                                    <i:InvokeCommandAction 
+                                    Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}, 
+                                    Path=DataContext.MouseMoveCommand}"
+                                    CommandParameter="{Binding}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Ellipse>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Border>
+    </Grid>
+</Window>
